@@ -8,6 +8,7 @@ Interactive landing page for Realtor AI with email waitlist functionality and en
 ### Core Components
 - **Email Waitlist Form**: Validates email and collects user signups
 - **Magnetic Form Effect**: Form subtly moves toward cursor for enhanced interactivity
+- **Animated Grid Background**: Subtle animated grid pattern for visual depth
 - **Attention Border**: Nav button triggers form highlighting
 - **Loading States**: Smooth transitions and loading indicators
 
@@ -41,6 +42,7 @@ app/
 │   ├── nav-button.tsx           # Top-right navigation button
 │   ├── header-group.tsx         # Header with logo text and nav
 │   ├── coastal-logo.tsx         # Coastal Elements logo image
+│   ├── AnimatedGrid.tsx         # Animated grid background
 │   ├── landing-page.tsx         # Main landing page layout
 │   ├── thank-you-page.tsx       # Success confirmation page
 │   └── svg-paths.ts            # SVG path definitions (legacy)
@@ -62,6 +64,7 @@ docs/
 
 ### Effect Components
 - **Magnetic Form Effect**: Form follows cursor movement for enhanced interactivity
+- **Animated Grid**: Interactive grid with real estate data points, mini charts, and NYPictogram background
 
 ### Page Components
 - **`LandingPage`**: Main landing view combining all elements
@@ -71,6 +74,7 @@ docs/
 ### Component Hierarchy
 ```
 Home (app/page.tsx)
+├── AnimatedGrid (AnimatedGrid.tsx)
 ├── LandingPage (landing-page.tsx)
 │   ├── Background Image
 │   ├── MagneticForm (magnetic-form.tsx)

@@ -25,7 +25,7 @@ export function LandingPage({ onSubmit, showAttentionBorder, onNavButtonClick }:
       
       <MagneticForm onSubmit={onSubmit} showAttentionBorder={showAttentionBorder} />
       
-      <div className="absolute font-['Sora',_sans-serif] font-normal leading-[0] left-1/2 not-italic text-[#000000] text-[100px] text-center text-nowrap top-[170px] tracking-[-4px] translate-x-[-50%] z-10">
+      <div className="absolute font-['Sora',_sans-serif] font-normal leading-[0] left-1/2 not-italic text-[#000000] text-[65px] sm:text-[80px] md:text-[100px] lg:text-[120px] xl:text-[140px] text-center text-nowrap top-6/12 tracking-[-4px] translate-x-[-50%] translate-y-[-50%] z-10">
         <p className="adjustLetterSpacing block leading-[normal] whitespace-pre">
           Realtor AI.
         </p>
@@ -39,14 +39,15 @@ export function LandingPage({ onSubmit, showAttentionBorder, onNavButtonClick }:
         <CoastalLogo />
       </div>
       
-      <div
-        className="absolute font-['Poppins',_sans-serif] font-light leading-[0] not-italic text-[#424242] text-[24px] text-center text-nowrap top-[140px] tracking-[-1.2px] translate-x-[-50%] z-10"
-        style={{ left: "calc(50% + 0.5px)" }}
-      >
+              <div
+          className="absolute font-['Poppins',_sans-serif] font-light leading-[0] not-italic text-[#424242] text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] xl:text-[40px] text-center text-nowrap top-5/12 tracking-[-1.2px] translate-x-[-50%] translate-y-[-40px] z-10"
+          style={{ left: "calc(50% + 0.5px)" }}
+        >
         <p className="adjustLetterSpacing block leading-[normal] whitespace-pre">
           Coastal Elements Presents,
         </p>
       </div>
+
     </>
   );
 } 

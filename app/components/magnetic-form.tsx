@@ -64,9 +64,9 @@ export function MagneticForm({ onSubmit, showAttentionBorder }: {
   return (
     <div 
       ref={frameRef}
-      className="absolute h-[54px] left-1/2 top-[350px] w-[380px] z-20 transition-transform duration-300 ease-out"
+      className="absolute h-[54px] left-1/2 top-1/2 w-[85vw] sm:w-[90vw] max-w-[380px] min-w-[250px] z-20 transition-transform duration-300 ease-out"
       style={{
-        transform: `translate(calc(-50% + ${magnetOffset.x}px), ${magnetOffset.y}px)`,
+        transform: `translate(calc(-50% + ${magnetOffset.x}px), calc(80px + ${magnetOffset.y}px))`,
       }}
     >
       <EmailInputForm onSubmit={onSubmit} showAttentionBorder={showAttentionBorder} />

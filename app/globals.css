@@ -74,7 +74,15 @@ input:focus-visible {
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
+  .text-\[140px\] {
+    font-size: 80px;
+  }
+  
+  .text-\[120px\] {
+    font-size: 70px;
+  }
+  
   .text-\[100px\] {
     font-size: 60px;
   }
@@ -83,12 +91,20 @@ input:focus-visible {
     font-size: 40px;
   }
   
-  .text-\[25px\] {
+  .text-\[40px\] {
+    font-size: 24px;
+  }
+  
+  .text-\[30px\] {
     font-size: 20px;
   }
   
-  .text-\[24px\] {
+  .text-\[25px\] {
     font-size: 18px;
+  }
+  
+  .text-\[24px\] {
+    font-size: 16px;
   }
   
   .w-\[380px\] {
@@ -98,11 +114,23 @@ input:focus-visible {
 }
 
 @media (max-width: 480px) {
+  .text-\[140px\] {
+    font-size: 60px;
+  }
+  
+  .text-\[120px\] {
+    font-size: 50px;
+  }
+  
   .text-\[100px\] {
-    font-size: 48px;
+    font-size: 40px;
   }
   
   .text-\[60px\] {
     font-size: 32px;
+  }
+  
+  .text-\[40px\] {
+    font-size: 20px;
   }
 }

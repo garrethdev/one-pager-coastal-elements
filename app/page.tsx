@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { LandingPage } from './components/landing-page';
 import { ThankYouPage } from './components/thank-you-page';
+import { AnimatedGrid } from './components/AnimatedGrid';
 
 export default function Home() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -28,6 +29,9 @@ export default function Home() {
 
   return (
     <div className="bg-[#ffffff] relative h-screen w-full overflow-hidden" data-name="Desktop - 1">
+      {/* Animated grid background */}
+      <AnimatedGrid />
+      
       {/* Conditionally render either landing page or thank you page */}
       {isSubmitted ? (
         <ThankYouPage />

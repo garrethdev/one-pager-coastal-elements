@@ -4,11 +4,11 @@ import React from 'react';
 
 export function ThankYouPage() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-white">
-      <h1 className="font-['Sora',_sans-serif] font-normal text-[#000000] text-[60px] text-center mb-2 z-10 tracking-[-4px]">
+    <div className="flex flex-col items-center justify-center h-screen bg-white px-4">
+      <h1 className="font-['Sora',_sans-serif] font-normal text-[#000000] text-[32px] sm:text-[40px] md:text-[50px] lg:text-[60px] text-center mb-2 z-10 tracking-[-4px]">
         Thanks for joining the waitlist!
       </h1>
-      <p className="font-['Poppins',_sans-serif] font-normal text-[#424242] text-[24px] text-center z-10">
+      <p className="font-['Poppins',_sans-serif] font-normal text-[#424242] text-[16px] sm:text-[18px] md:text-[20px] lg:text-[24px] text-center z-10">
         You&apos;ll be the first to know when Realtor AI goes live.
       </p>
     </div>
