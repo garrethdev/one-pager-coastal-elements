@@ -1,0 +1,37 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  try {
+    const { email } = await request.json();
+    
+    if (!email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    const response = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.HUBSPOT_PRIVATE_APP_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        properties: {
+          email
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('HubSpot API error:', error);
+      return NextResponse.json({ error: 'Failed to save email' }, { status: 500 });
+    }
+
+    const data = await response.json();
+    return NextResponse.json({ success: true, data });
+    
+  } catch (error) {
+    console.error('Email submission error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+} 

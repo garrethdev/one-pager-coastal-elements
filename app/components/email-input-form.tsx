@@ -9,15 +9,36 @@ export function EmailInputForm({ onSubmit, showAttentionBorder }: { onSubmit: (e
     return emailRegex.test(email);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (email.trim() && isValidEmail(email)) {
       setIsLoading(true);
       
-      // Show loading for 2 seconds then navigate
-      setTimeout(() => {
+      try {
+        const res = await fetch('/api/submit-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const result = await res.json();
+        
+        if (result.success) {
+          console.log('Email saved to HubSpot successfully!');
+          // Show loading for 2 seconds then navigate
+          setTimeout(() => {
+            setIsLoading(false);
+            onSubmit(email);
+          }, 2000);
+        } else {
+          console.error('Error saving email:', result.error);
+          setIsLoading(false);
+          // You can add error handling here (e.g., show error message)
+        }
+      } catch (error) {
+        console.error('Email submission error:', error);
         setIsLoading(false);
-        onSubmit(email);
-      }, 2000);
+        // You can add error handling here (e.g., show error message)
+      }
     }
   };
 

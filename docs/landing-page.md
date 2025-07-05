@@ -93,6 +93,7 @@ Home (app/page.tsx)
 - React 18+
 - Tailwind CSS
 - Google Fonts (Sora, Poppins)
+- HubSpot API (for email collection)
 
 ## Benefits of Modular Architecture
 1. **Maintainability**: Each component has a single responsibility
@@ -103,7 +104,14 @@ Home (app/page.tsx)
 6. **Bundle Optimization**: Better tree-shaking and code splitting
 
 ## Security & Performance
-- Email validation on frontend
+- Email validation on frontend and backend
+- HubSpot API integration for email collection
 - Optimized animations with CSS transforms
 - Responsive design for all screen sizes
-- Accessibility-compliant interactions 
+- Accessibility-compliant interactions
+
+## Environment Variables
+Create a `.env.local` file in the root directory with:
+```
+HUBSPOT_PRIVATE_APP_TOKEN=your_hubspot_private_app_token_here
+``` 
