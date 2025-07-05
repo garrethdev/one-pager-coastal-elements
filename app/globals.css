@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --fill-0: #000000;
 }
 
 @theme inline {
@@ -10,17 +11,98 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-sora: var(--font-sora);
+  --font-poppins: var(--font-poppins);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #171717;
+    --fill-0: #000000;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Custom styles for the landing page */
+.adjustLetterSpacing {
+  letter-spacing: inherit;
+}
+
+/* Ensure proper font rendering */
+.font-sora {
+  font-family: var(--font-sora), sans-serif;
+}
+
+.font-poppins {
+  font-family: var(--font-poppins), sans-serif;
+}
+
+/* Smooth scrolling and performance optimizations */
+* {
+  box-sizing: border-box;
+}
+
+/* Cursor trail performance optimization */
+.cursor-trail {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #1c1348;
+  outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .text-\[100px\] {
+    font-size: 60px;
+  }
+  
+  .text-\[60px\] {
+    font-size: 40px;
+  }
+  
+  .text-\[25px\] {
+    font-size: 20px;
+  }
+  
+  .text-\[24px\] {
+    font-size: 18px;
+  }
+  
+  .w-\[380px\] {
+    width: 90vw;
+    max-width: 380px;
+  }
+}
+
+@media (max-width: 480px) {
+  .text-\[100px\] {
+    font-size: 48px;
+  }
+  
+  .text-\[60px\] {
+    font-size: 32px;
+  }
 }
