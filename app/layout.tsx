@@ -28,8 +28,9 @@ export const metadata: Metadata = {
   description: "Revolutionary AI-powered real estate platform by Coastal Elements. Join the waitlist to be the first to experience the future of real estate.",
   keywords: "realtor, AI, real estate, artificial intelligence, property, waitlist",
   authors: [{ name: "Coastal Elements" }],
-  viewport: "width=device-width, initial-scale=1",
 };
+
+export const viewport = "width=device-width, initial-scale=1";
 
 export default function RootLayout({
   children,

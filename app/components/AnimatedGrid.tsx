@@ -85,7 +85,15 @@ export function AnimatedGrid() {
     { x: 90, y: 45 }, { x: 10, y: 85 }, { x: 50, y: 90 }, { x: 85, y: 82 },
   ];
 
-  const generateMiniChart = (chart: any, index: number) => {
+  interface ChartData {
+    x: string;
+    y: string;
+    width: number;
+    height: number;
+    points: number[];
+  }
+
+  const generateMiniChart = (chart: ChartData, index: number) => {
     const pathData = chart.points.map((point: number, i: number) => {
       const x = (i / (chart.points.length - 1)) * chart.width;
       const y = chart.height - (point * chart.height);

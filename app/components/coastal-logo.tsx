@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 
 export function CoastalLogo() {
   return (
@@ -9,9 +10,11 @@ export function CoastalLogo() {
       data-name="Coastal Elements Logo-03 1"
       style={{ left: "calc(50% + 0.5px)" }}
     >
-      <img
+      <Image
         src="/images/Coastal Elements Logo.png"
         alt="Coastal Elements Logo"
+        width={65}
+        height={64}
         className="block size-full object-contain"
       />
     </div>
