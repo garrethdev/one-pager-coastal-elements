@@ -26,8 +26,8 @@ git pull
 rm -rf node_modules/ .next
 # Use the node version's npm/yarn
 export PATH="$HOME/.nvm/versions/node/$(nvm current)/bin:$PATH"
-npm install 
-npm run build
+yarn 
+yarn run build
 
 # Restart PM2 processes
 echo "Restarting PM2 processes..."
