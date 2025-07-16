@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { LoadingSpinner } from './loading-spinner';
 
 export function EmailInputForm({ onSubmit, showAttentionBorder }: { onSubmit: (email: string) => void, showAttentionBorder: boolean }) {
@@ -32,12 +33,12 @@ export function EmailInputForm({ onSubmit, showAttentionBorder }: { onSubmit: (e
         } else {
           console.error('Error saving email:', result.error);
           setIsLoading(false);
-          // You can add error handling here (e.g., show error message)
+          toast.error(result.error || 'Failed to save email. Please try again.');
         }
       } catch (error) {
         console.error('Email submission error:', error);
         setIsLoading(false);
-        // You can add error handling here (e.g., show error message)
+        toast.error('Network error. Please check your connection and try again.');
       }
     }
   };

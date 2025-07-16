@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { LandingPage } from '../components/landing-page';
 import { ThankYouPage } from '../components/thank-you-page';
 import { AnimatedGrid } from '../components/AnimatedGrid';
+import { toast } from 'react-toastify';
 
 export default function Home() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -12,10 +13,17 @@ export default function Home() {
   const [showAttentionBorder, setShowAttentionBorder] = useState(false);
 
   const handleSubmit = (email: string) => {
-    setSubmittedEmail(email);
-    setIsSubmitted(true);
-    console.log('Email submitted:', email);
+    try {
+      setSubmittedEmail(email);
+      setIsSubmitted(true);
+      console.log('Email submitted:', email);
+      toast.success('Successfully joined the waitlist!');
+    } catch (e) {
+      const error = e as Error;
+      toast.error(error.message || 'Something went wrong. Please try again.');
+    }
   };
+  
 
   const handleNavButtonClick = () => {
     console.log('handleNavButtonClick called!'); // Debug log
