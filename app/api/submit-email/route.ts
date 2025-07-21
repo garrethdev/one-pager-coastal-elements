@@ -16,7 +16,8 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         properties: {
-          email
+          email,
+          source: 'wait_list_page'
         }
       }),
     });
@@ -24,6 +25,9 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const error = await response.json();
       console.error('HubSpot API error:', error);
+      if (response.status === 409 && error.category === 'CONFLICT') {
+        return NextResponse.json({ message: "You're already on the waitlist." }, { status: 409 });
+      }
       return NextResponse.json({ error: error.message || 'Failed to save email' }, { status: 500 });
     }
 

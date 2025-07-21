@@ -23,7 +23,11 @@ export function EmailInputForm({ onSubmit, showAttentionBorder }: { onSubmit: (e
 
         const result = await res.json();
         
-        if (result.success) {
+        if (res.status === 409) {
+          // User already on the waitlist
+          setIsLoading(false);
+          toast.info(result.message || "You're already on the waitlist.");
+        } else if (result.success) {
           console.log('Email saved to HubSpot successfully!');
           // Show loading for 2 seconds then navigate
           setTimeout(() => {
