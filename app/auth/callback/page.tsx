@@ -13,6 +13,10 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        console.log('🔍 Callback started, checking URL hash...');
+        console.log('Full URL:', window.location.href);
+        console.log('Hash:', window.location.hash);
+        
         // Get hash params from URL
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         
@@ -23,8 +27,17 @@ export default function AuthCallback() {
         const errorParam = hashParams.get('error');
         const errorDescription = hashParams.get('error_description');
 
+        console.log('📝 Extracted params:', {
+          hasAccessToken: !!accessToken,
+          hasRefreshToken: !!refreshToken,
+          expiresIn,
+          tokenType,
+          error: errorParam,
+        });
+
         // Check for errors
         if (errorParam) {
+          console.error('❌ Auth error:', errorParam, errorDescription);
           setError(errorDescription || 'Authentication failed');
           setIsProcessing(false);
           return;
@@ -32,14 +45,17 @@ export default function AuthCallback() {
 
         // Validate tokens
         if (!accessToken || !refreshToken) {
+          console.error('❌ Missing tokens!', { accessToken: !!accessToken, refreshToken: !!refreshToken });
           setError('Missing authentication tokens');
           setIsProcessing(false);
           return;
         }
 
         // Extract email from token (JWT decode - simple version)
+        console.log('🔐 Decoding JWT token...');
         const tokenParts = accessToken.split('.');
         if (tokenParts.length !== 3) {
+          console.error('❌ Invalid JWT format');
           setError('Invalid token format');
           setIsProcessing(false);
           return;
@@ -49,7 +65,10 @@ export default function AuthCallback() {
         const email = payload.email;
         const userId = payload.sub;
 
+        console.log('👤 User info from token:', { email, userId });
+
         if (!email || !userId) {
+          console.error('❌ Missing email or userId in token');
           setError('Invalid token payload');
           setIsProcessing(false);
           return;
@@ -65,28 +84,41 @@ export default function AuthCallback() {
           token_type: tokenType || 'bearer',
         };
 
+        console.log('💾 Saving user data to localStorage...');
+        localStorage.setItem('coastal_user', JSON.stringify(userData));
+        localStorage.setItem('coastal_auth_token', accessToken);
+        
         // Get user profile from backend
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/users/profile`, {
+        console.log('📡 Fetching user profile from backend...');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+        console.log('API URL:', apiUrl);
+        
+        const response = await fetch(`${apiUrl}/users/profile`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
         });
 
+        console.log('📡 Profile fetch response:', response.status, response.statusText);
+
         if (response.ok) {
           const profileData = await response.json();
+          console.log('✅ Profile data received:', profileData);
           
           // Save to localStorage
-          localStorage.setItem('coastal_user', JSON.stringify(userData));
           localStorage.setItem('coastal_profile', JSON.stringify(profileData.data || profileData));
-          localStorage.setItem('coastal_auth_token', accessToken);
-
+          
+          console.log('✅ All data saved! Redirecting to dashboard...');
           // Redirect to dashboard
-          router.push('/dashboard');
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 100);
         } else {
-          // If profile fetch fails, still save user data and redirect
-          localStorage.setItem('coastal_user', JSON.stringify(userData));
-          localStorage.setItem('coastal_auth_token', accessToken);
-          router.push('/dashboard');
+          console.warn('⚠️ Profile fetch failed, but continuing with basic user data');
+          // If profile fetch fails, still redirect (profile can be fetched later)
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 100);
         }
       } catch (err) {
         console.error('Callback error:', err);
