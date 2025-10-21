@@ -330,7 +330,7 @@ class ApiClient {
    * Save a search
    */
   async saveSearch(token: string, searchQuery: string): Promise<ApiResponse> {
-    return this.post('/saved-searches', { searchQuery }, token);
+    return this.post('/saved-searches', { search_query: searchQuery }, token);
   }
 
   /**

@@ -106,8 +106,15 @@ function SearchPageContent() {
 
       if (response.success && response.data) {
         // Create blob and download
-        const csvContent = response.data.data.csv || response.data.csv;
-        const filename = response.data.data.filename || response.data.filename || 'export.csv';
+        const exportData = response.data.data || response.data;
+        const csvContent = exportData.csv;
+        const filename = exportData.filename || 'export.csv';
+        const totalProperties = exportData.total_properties || 0;
+        
+        if (!csvContent) {
+          alert('No CSV data received');
+          return;
+        }
         
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
@@ -123,12 +130,13 @@ function SearchPageContent() {
         // Refresh profile to update credits
         await refreshProfile();
 
-        alert(`Exported ${response.data.data?.total_properties || response.data.total_properties} properties!`);
+        alert(`Exported ${totalProperties} properties!`);
       } else {
         alert(response.error || 'Failed to export');
       }
     } catch (err) {
-      alert('An error occurred while exporting');
+      console.error('Export error:', err);
+      alert('An error occurred while exporting: ' + (err instanceof Error ? err.message : 'Unknown error'));
     } finally {
       setIsExporting(false);
     }
