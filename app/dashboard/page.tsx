@@ -113,27 +113,33 @@ function DashboardContent() {
             </p>
           </button>
 
-          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 opacity-50">
+          <button
+            onClick={() => router.push('/saved-searches')}
+            className="bg-green-50 hover:bg-green-100 border-2 border-green-200 hover:border-green-300 rounded-lg p-6 transition text-left"
+          >
             <div className="text-4xl mb-2">💾</div>
             <h4 className="font-semibold text-gray-900 mb-2">Saved Searches</h4>
             <p className="text-sm text-gray-600">
               Save your favorite searches and get instant updates
             </p>
-            <p className="text-xs text-gray-500 mt-3">
-              Coming soon...
+            <p className="text-xs text-green-600 mt-3 font-semibold">
+              View saved searches →
             </p>
-          </div>
+          </button>
 
-          <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 opacity-50">
+          <button
+            onClick={() => router.push('/search')}
+            className="bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 hover:border-purple-300 rounded-lg p-6 transition text-left"
+          >
             <div className="text-4xl mb-2">📊</div>
             <h4 className="font-semibold text-gray-900 mb-2">Export Data</h4>
             <p className="text-sm text-gray-600">
               Export search results to CSV for further analysis
             </p>
-            <p className="text-xs text-gray-500 mt-3">
-              Coming soon...
+            <p className="text-xs text-purple-600 mt-3 font-semibold">
+              Search then export →
             </p>
-          </div>
+          </button>
         </div>
       </main>
     </div>

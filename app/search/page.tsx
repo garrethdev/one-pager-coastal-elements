@@ -21,8 +21,14 @@ function SearchPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchInfo, setSearchInfo] = useState<any>(null);
+  const [lastQuery, setLastQuery] = useState('');
+  const [lastFilters, setLastFilters] = useState<any>({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleSearch = async (query: string, filters: any) => {
+    setLastQuery(query); // Save last query for saving later
+    setLastFilters(filters); // Save filters for export
     if (!user?.access_token) {
       setError('Please login to search');
       return;
@@ -68,6 +74,66 @@ function SearchPageContent() {
     }
   };
 
+  const handleSaveSearch = async () => {
+    if (!user?.access_token || !lastQuery) return;
+
+    setIsSaving(true);
+    try {
+      const response = await apiClient.saveSearch(user.access_token, lastQuery);
+
+      if (response.success) {
+        alert('Search saved successfully!');
+      } else {
+        alert(response.error || 'Failed to save search');
+      }
+    } catch (err) {
+      alert('An error occurred while saving');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleExport = async () => {
+    if (!user?.access_token || !lastQuery) return;
+
+    setIsExporting(true);
+    try {
+      const response = await apiClient.exportSearchToCsv(
+        user.access_token,
+        lastQuery,
+        lastFilters
+      );
+
+      if (response.success && response.data) {
+        // Create blob and download
+        const csvContent = response.data.data.csv || response.data.csv;
+        const filename = response.data.data.filename || response.data.filename || 'export.csv';
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Refresh profile to update credits
+        await refreshProfile();
+
+        alert(`Exported ${response.data.data?.total_properties || response.data.total_properties} properties!`);
+      } else {
+        alert(response.error || 'Failed to export');
+      }
+    } catch (err) {
+      alert('An error occurred while exporting');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -108,7 +174,7 @@ function SearchPageContent() {
         {searchInfo && !isLoading && (
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex justify-between items-center">
-              <div>
+              <div className="flex-1">
                 <p className="text-blue-900 font-semibold">
                   Search Complete!
                 </p>
@@ -116,11 +182,57 @@ function SearchPageContent() {
                   Found {searchInfo.pagination?.total || results.length} results
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-blue-700 text-sm">Credits Used: {searchInfo.creditsUsed}</p>
-                <p className="text-blue-900 font-semibold">
-                  Remaining: {searchInfo.remainingCredits}
-                </p>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className="text-blue-700 text-sm">Credits Used: {searchInfo.creditsUsed}</p>
+                  <p className="text-blue-900 font-semibold">
+                    Remaining: {searchInfo.remainingCredits}
+                  </p>
+                </div>
+                <button
+                  onClick={handleSaveSearch}
+                  disabled={isSaving}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition disabled:bg-green-300 flex items-center"
+                >
+                  {isSaving ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Save Search
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={handleExport}
+                  disabled={isExporting}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition disabled:bg-purple-300 flex items-center"
+                >
+                  {isExporting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Export CSV
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>

@@ -287,6 +287,24 @@ class ApiClient {
     return this.get('/search/quick-lists', token);
   }
 
+  /**
+   * Export search results to CSV
+   */
+  async exportSearchToCsv(
+    token: string,
+    query: string,
+    filters?: any
+  ): Promise<ApiResponse> {
+    return this.post(
+      '/search/export',
+      {
+        query,
+        filters,
+      },
+      token
+    );
+  }
+
   // ============= SAVED SEARCHES ENDPOINTS =============
 
   /**
