@@ -99,27 +99,39 @@ function DashboardContent() {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
+          <button
+            onClick={() => router.push('/search')}
+            className="bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 hover:border-blue-300 rounded-lg p-6 transition text-left"
+          >
             <div className="text-4xl mb-2">🔍</div>
             <h4 className="font-semibold text-gray-900 mb-2">Search Properties</h4>
             <p className="text-sm text-gray-600">
               Search through millions of properties with AI-powered insights
             </p>
-          </div>
+            <p className="text-xs text-blue-600 mt-3 font-semibold">
+              Click to start searching →
+            </p>
+          </button>
 
-          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6">
+          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 opacity-50">
             <div className="text-4xl mb-2">💾</div>
             <h4 className="font-semibold text-gray-900 mb-2">Saved Searches</h4>
             <p className="text-sm text-gray-600">
               Save your favorite searches and get instant updates
             </p>
+            <p className="text-xs text-gray-500 mt-3">
+              Coming soon...
+            </p>
           </div>
 
-          <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6">
+          <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 opacity-50">
             <div className="text-4xl mb-2">📊</div>
             <h4 className="font-semibold text-gray-900 mb-2">Export Data</h4>
             <p className="text-sm text-gray-600">
               Export search results to CSV for further analysis
+            </p>
+            <p className="text-xs text-gray-500 mt-3">
+              Coming soon...
             </p>
           </div>
         </div>
