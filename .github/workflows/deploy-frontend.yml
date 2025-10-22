@@ -1,0 +1,53 @@
+name: Deploy Frontend to AWS Amplify
+
+on:
+  push:
+    branches: 
+      - dev
+      - main
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  notify:
+    name: Notify Amplify Deployment (${{ github.ref_name }})
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deployment Info
+      run: |
+        echo "🚀 Frontend deployment triggered!"
+        echo "Branch: ${{ github.ref_name }}"
+        echo ""
+        if [ "${{ github.ref_name }}" == "main" ]; then
+          echo "📍 Environment: PRODUCTION"
+          echo "🔗 Will deploy to: https://main.xxxxx.amplifyapp.com"
+          echo ""
+          echo "⚠️  Make sure Amplify environment variables are set:"
+          echo "   - NEXT_PUBLIC_API_URL_PROD"
+          echo "   - NEXT_PUBLIC_API_TIMEOUT"
+          echo "   - NEXT_PUBLIC_ENV"
+        else
+          echo "📍 Environment: DEVELOPMENT"
+          echo "🔗 Will deploy to: https://dev.xxxxx.amplifyapp.com"
+          echo ""
+          echo "⚠️  Make sure Amplify environment variables are set:"
+          echo "   - NEXT_PUBLIC_API_URL_DEV"
+          echo "   - NEXT_PUBLIC_API_TIMEOUT"
+          echo "   - NEXT_PUBLIC_ENV"
+        fi
+        echo ""
+        echo "✅ AWS Amplify will auto-detect this push and deploy!"
+        echo "📊 Monitor deployment: https://console.aws.amazon.com/amplify/"
+    
+    # Optional: You can add a webhook to notify Slack, Discord, etc.
+    # - name: Notify Slack
+    #   uses: 8398a7/action-slack@v3
+    #   with:
+    #     status: ${{ job.status }}
+    #     text: 'Frontend deployment started for ${{ github.ref_name }}'
+    #     webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+    #   if: always()
+
