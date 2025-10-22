@@ -95,6 +95,7 @@ export function SearchResults({ results, isLoading, pagination }: SearchResultsP
             {/* Image */}
             <div className="h-48 bg-gray-200 relative">
               {result.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={result.image_url}
                   alt={result.title}
