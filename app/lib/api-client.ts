@@ -3,10 +3,16 @@
  * Nag-handle ng lahat ng HTTP requests sa backend
  */
 
+// Extend Window interface para sa __ENV property
+declare global {
+  interface Window {
+    __ENV?: Record<string, string>;
+  }
+}
+
 const getEnvVar = (key: string, defaultValue: string): string => {
   if (typeof window !== 'undefined') {
-    const env = (window as any).__ENV;
-    return env?.[key] || defaultValue;
+    return window.__ENV?.[key] || defaultValue;
   }
   return process.env[key] || defaultValue;
 };
