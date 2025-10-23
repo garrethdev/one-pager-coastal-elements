@@ -3,22 +3,8 @@
  * Nag-handle ng lahat ng HTTP requests sa backend
  */
 
-// Extend Window interface para sa __ENV property
-declare global {
-  interface Window {
-    __ENV?: Record<string, string>;
-  }
-}
-
-const getEnvVar = (key: string, defaultValue: string): string => {
-  if (typeof window !== 'undefined') {
-    return window.__ENV?.[key] || defaultValue;
-  }
-  return process.env[key] || defaultValue;
-};
-
-const API_URL = getEnvVar('NEXT_PUBLIC_API_URL', 'http://localhost:3001/api');
-const API_TIMEOUT = parseInt(getEnvVar('NEXT_PUBLIC_API_TIMEOUT', '10000'));
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '10000');
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
