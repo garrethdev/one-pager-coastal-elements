@@ -1,6 +1,6 @@
 'use client';
 
-interface SearchResult {
+export interface SearchResult {
   id: string;
   title: string;
   description: string;
@@ -8,6 +8,7 @@ interface SearchResult {
   price: number;
   image_url: string;
   property_type: string;
+  [key: string]: unknown;
 }
 
 interface SearchResultsProps {

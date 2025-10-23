@@ -42,7 +42,7 @@ function SavedSearchesContent() {
       const response = await apiClient.getSavedSearches(user.access_token);
 
       if (response.success && response.data) {
-        setSearches(response.data.data || response.data);
+        setSearches(response.data.data || []);
       } else {
         setError(response.error || 'Failed to load saved searches');
       }
