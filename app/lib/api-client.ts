@@ -5,16 +5,16 @@
 
 const getEnvVar = (key: string, defaultValue: string): string => {
   if (typeof window !== 'undefined') {
-    return (window as any).__ENV?.[key] || defaultValue;
+    return (window as Record<string, unknown>).__ENV?.[key] as string || defaultValue;
   }
-  // @ts-ignore - process.env is available in Next.js
+  // @ts-expect-error - process.env is available in Next.js
   return process.env[key] || defaultValue;
 };
 
-const API_URL = getEnvVar('NEXT_PUBLIC_API_URL', 'http://localhost:3000/api');
+const API_URL = getEnvVar('NEXT_PUBLIC_API_URL', 'http://localhost:3001/api');
 const API_TIMEOUT = parseInt(getEnvVar('NEXT_PUBLIC_API_TIMEOUT', '10000'));
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
@@ -91,7 +91,7 @@ class ApiClient {
   /**
    * GET request
    */
-  async get<T = any>(endpoint: string, token?: string): Promise<ApiResponse<T>> {
+  async get<T = unknown>(endpoint: string, token?: string): Promise<ApiResponse<T>> {
     try {
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
@@ -128,9 +128,9 @@ class ApiClient {
   /**
    * POST request
    */
-  async post<T = any>(
+  async post<T = unknown>(
     endpoint: string,
-    body: any,
+    body: Record<string, unknown>,
     token?: string
   ): Promise<ApiResponse<T>> {
     try {
@@ -170,7 +170,7 @@ class ApiClient {
   /**
    * DELETE request
    */
-  async delete<T = any>(endpoint: string, token?: string): Promise<ApiResponse<T>> {
+  async delete<T = unknown>(endpoint: string, token?: string): Promise<ApiResponse<T>> {
     try {
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ class ApiClient {
   /**
    * Verify OTP code
    */
-  async verifyOtp(email: string, token: string): Promise<any> {
+  async verifyOtp(email: string, token: string): Promise<AuthResponse> {
     return this.post('/auth/otp/verify', { email, token });
   }
 
@@ -264,7 +264,7 @@ class ApiClient {
   async searchProperties(
     token: string,
     query: string,
-    filters?: any,
+    filters?: Record<string, unknown>,
     page?: number,
     limit?: number
   ): Promise<ApiResponse> {
@@ -293,7 +293,7 @@ class ApiClient {
   async exportSearchToCsv(
     token: string,
     query: string,
-    filters?: any
+    filters?: Record<string, unknown>
   ): Promise<ApiResponse> {
     return this.post(
       '/search/export',

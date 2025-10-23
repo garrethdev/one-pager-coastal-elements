@@ -15,18 +15,29 @@ export default function SearchPage() {
   );
 }
 
+interface SearchResult {
+  id: string;
+  [key: string]: unknown;
+}
+
+interface SearchInfo {
+  creditsUsed: number;
+  remainingCredits: number;
+  pagination?: unknown;
+}
+
 function SearchPageContent() {
   const { user, profile, refreshProfile } = useAuth();
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [searchInfo, setSearchInfo] = useState<any>(null);
+  const [searchInfo, setSearchInfo] = useState<SearchInfo | null>(null);
   const [lastQuery, setLastQuery] = useState('');
-  const [lastFilters, setLastFilters] = useState<any>({});
+  const [lastFilters, setLastFilters] = useState<Record<string, unknown>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleSearch = async (query: string, filters: any) => {
+  const handleSearch = async (query: string, filters: Record<string, unknown>) => {
     setLastQuery(query); // Save last query for saving later
     setLastFilters(filters); // Save filters for export
     if (!user?.access_token) {
@@ -66,8 +77,8 @@ function SearchPageContent() {
         setError(response.error || 'Search failed');
         setResults([]);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+    } catch {
+      setError('An error occurred');
       setResults([]);
     } finally {
       setIsLoading(false);
@@ -86,7 +97,7 @@ function SearchPageContent() {
       } else {
         alert(response.error || 'Failed to save search');
       }
-    } catch (err) {
+    } catch {
       alert('An error occurred while saving');
     } finally {
       setIsSaving(false);

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface SearchFormProps {
-  onSearch: (query: string, filters: any) => void;
+  onSearch: (query: string, filters: Record<string, unknown>) => void;
   isLoading: boolean;
 }
 

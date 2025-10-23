@@ -29,6 +29,7 @@ function SavedSearchesContent() {
 
   useEffect(() => {
     loadSavedSearches();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadSavedSearches = async () => {
@@ -45,7 +46,7 @@ function SavedSearchesContent() {
       } else {
         setError(response.error || 'Failed to load saved searches');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred while loading searches');
     } finally {
       setIsLoading(false);
@@ -65,7 +66,7 @@ function SavedSearchesContent() {
       } else {
         alert(response.error || 'Failed to delete search');
       }
-    } catch (err) {
+    } catch {
       alert('An error occurred while deleting');
     }
   };

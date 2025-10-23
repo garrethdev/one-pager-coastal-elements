@@ -76,7 +76,7 @@ export function OtpVerificationForm({ email, onBack }: OtpVerificationFormProps)
         setOtp(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred. Please try again.');
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
@@ -98,7 +98,7 @@ export function OtpVerificationForm({ email, onBack }: OtpVerificationFormProps)
       } else {
         setError(result.error || 'Failed to resend code');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to resend code');
     } finally {
       setIsLoading(false);

@@ -39,7 +39,7 @@ export function OtpRequestForm({ onOtpSent }: OtpRequestFormProps) {
       } else {
         setError(result.error || 'Failed to send OTP. Please try again.');
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);

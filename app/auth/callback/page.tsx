@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../context/AuthContext';
 
 export default function AuthCallback() {
   const router = useRouter();
-  const { login } = useAuth();
   const [error, setError] = useState('');
   const [isProcessing, setIsProcessing] = useState(true);
 
@@ -90,7 +88,7 @@ export default function AuthCallback() {
         
         // Get user profile from backend
         console.log('📡 Fetching user profile from backend...');
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
         console.log('API URL:', apiUrl);
         
         const response = await fetch(`${apiUrl}/users/profile`, {
