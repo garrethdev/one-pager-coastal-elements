@@ -5,9 +5,9 @@
 
 const getEnvVar = (key: string, defaultValue: string): string => {
   if (typeof window !== 'undefined') {
-    return (window as Record<string, unknown>).__ENV?.[key] as string || defaultValue;
+    const env = (window as any).__ENV;
+    return env?.[key] || defaultValue;
   }
-  // @ts-expect-error - process.env is available in Next.js
   return process.env[key] || defaultValue;
 };
 
@@ -217,7 +217,7 @@ class ApiClient {
    * Verify OTP code
    */
   async verifyOtp(email: string, token: string): Promise<AuthResponse> {
-    return this.post('/auth/otp/verify', { email, token });
+    return this.post('/auth/otp/verify', { email, token }) as Promise<AuthResponse>;
   }
 
   /**
