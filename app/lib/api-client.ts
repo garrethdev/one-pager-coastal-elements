@@ -59,6 +59,37 @@ export interface UserProfile {
   created_at: string;
 }
 
+export interface SavedSearch {
+  id: string;
+  search_query: string;
+  created_at: string;
+}
+
+export interface SavedSearchesResponse {
+  data: SavedSearch[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface SearchResultsResponse {
+  data: unknown[];
+  credits_used: number;
+  remaining_credits: number;
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
+export interface ExportResponse {
+  csv: string;
+  filename: string;
+  total_properties: number;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -273,8 +304,8 @@ class ApiClient {
     filters?: Record<string, unknown>,
     page?: number,
     limit?: number
-  ): Promise<ApiResponse> {
-    return this.post(
+  ): Promise<ApiResponse<SearchResultsResponse>> {
+    return this.post<SearchResultsResponse>(
       '/search',
       {
         query,
@@ -300,8 +331,8 @@ class ApiClient {
     token: string,
     query: string,
     filters?: Record<string, unknown>
-  ): Promise<ApiResponse> {
-    return this.post(
+  ): Promise<ApiResponse<ExportResponse>> {
+    return this.post<ExportResponse>(
       '/search/export',
       {
         query,
@@ -320,13 +351,13 @@ class ApiClient {
     token: string,
     page?: number,
     limit?: number
-  ): Promise<ApiResponse> {
+  ): Promise<ApiResponse<SavedSearchesResponse>> {
     const params = new URLSearchParams();
     if (page) params.append('page', page.toString());
     if (limit) params.append('limit', limit.toString());
     
     const queryString = params.toString();
-    return this.get(
+    return this.get<SavedSearchesResponse>(
       `/saved-searches${queryString ? `?${queryString}` : ''}`,
       token
     );
@@ -335,8 +366,8 @@ class ApiClient {
   /**
    * Save a search
    */
-  async saveSearch(token: string, searchQuery: string): Promise<ApiResponse> {
-    return this.post('/saved-searches', { search_query: searchQuery }, token);
+  async saveSearch(token: string, searchQuery: string): Promise<ApiResponse<SavedSearch>> {
+    return this.post<SavedSearch>('/saved-searches', { search_query: searchQuery }, token);
   }
 
   /**

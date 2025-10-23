@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
 import { SearchForm } from '../components/search/SearchForm';
-import { SearchResults } from '../components/search/SearchResults';
+import { SearchResults, SearchResult } from '../components/search/SearchResults';
 import { apiClient } from '../lib/api-client';
 
 export default function SearchPage() {
@@ -15,15 +15,15 @@ export default function SearchPage() {
   );
 }
 
-interface SearchResult {
-  id: string;
-  [key: string]: unknown;
-}
-
 interface SearchInfo {
   creditsUsed: number;
   remainingCredits: number;
-  pagination?: unknown;
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
 }
 
 function SearchPageContent() {
@@ -64,7 +64,7 @@ function SearchPageContent() {
       );
 
       if (response.success && response.data) {
-        setResults(response.data.data || response.data);
+        setResults((response.data.data || []) as SearchResult[]);
         setSearchInfo({
           creditsUsed: response.data.credits_used || 1,
           remainingCredits: response.data.remaining_credits,
@@ -117,10 +117,9 @@ function SearchPageContent() {
 
       if (response.success && response.data) {
         // Create blob and download
-        const exportData = response.data.data || response.data;
-        const csvContent = exportData.csv;
-        const filename = exportData.filename || 'export.csv';
-        const totalProperties = exportData.total_properties || 0;
+        const csvContent = response.data.csv;
+        const filename = response.data.filename || 'export.csv';
+        const totalProperties = response.data.total_properties || 0;
         
         if (!csvContent) {
           alert('No CSV data received');
