@@ -64,11 +64,11 @@ function SearchPageContent() {
       );
 
       if (response.success && response.data) {
-        setResults((response.data.data || []) as SearchResult[]);
+        setResults(response.data as SearchResult[]);
         setSearchInfo({
-          creditsUsed: response.data.credits_used || 1,
-          remainingCredits: response.data.remaining_credits,
-          pagination: response.data.pagination,
+          creditsUsed: response.credits_used || 1,
+          remainingCredits: response.remaining_credits || 0,
+          pagination: response.pagination,
         });
 
         // Refresh profile to update credits
