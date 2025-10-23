@@ -58,7 +58,8 @@ export interface SavedSearchesResponse {
   limit: number;
 }
 
-export interface SearchResultsResponse {
+export interface SearchResponse {
+  success: boolean;
   data: unknown[];
   credits_used: number;
   remaining_credits: number;
@@ -68,6 +69,8 @@ export interface SearchResultsResponse {
     limit: number;
     pages: number;
   };
+  error?: string;
+  message?: string;
 }
 
 export interface ExportResponse {
@@ -290,8 +293,8 @@ class ApiClient {
     filters?: Record<string, unknown>,
     page?: number,
     limit?: number
-  ): Promise<ApiResponse<SearchResultsResponse>> {
-    return this.post<SearchResultsResponse>(
+  ): Promise<SearchResponse> {
+    return this.post(
       '/search',
       {
         query,
@@ -300,7 +303,7 @@ class ApiClient {
         limit,
       },
       token
-    );
+    ) as Promise<SearchResponse>;
   }
 
   /**
