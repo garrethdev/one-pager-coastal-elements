@@ -79,6 +79,13 @@ export interface ExportResponse {
   total_properties: number;
 }
 
+export interface QuickList {
+  id: string;
+  name: string;
+  description: string;
+  query: string;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -309,8 +316,8 @@ class ApiClient {
   /**
    * Get quick lists
    */
-  async getQuickLists(token: string): Promise<ApiResponse> {
-    return this.get('/search/quick-lists', token);
+  async getQuickLists(token: string): Promise<ApiResponse<QuickList[]>> {
+    return this.get<QuickList[]>('/search/quick-lists', token);
   }
 
   /**

@@ -14,6 +14,24 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
+  // Boolean toggles (no additional values needed)
+  const [quickFilter, setQuickFilter] = useState({
+    absenteeOwner: false,
+    ownerOccupied: false,
+    propertyVacant: false,
+    freeAndClear: false,
+    preforeclosureStatus: false,
+    tiredLandlord: false,
+    landVacantlot: false,
+  });
+
+  // Value fields (require inputs)
+  const [quickFilterValues, setQuickFilterValues] = useState({
+    estimatedEquityRateMin: '',
+    taxDelinquentYearMin: '',
+    purchaseDateMin: '',
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -22,11 +40,28 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       return;
     }
 
-    const filters = {
+    // Build quickFilter object with only true keys
+    const enabledQuickFilter: Record<string, boolean> = {};
+    Object.entries(quickFilter).forEach(([k, v]) => {
+      if (v) enabledQuickFilter[k] = true;
+    });
+
+    // Build quickFilterValues object with only non-empty values
+    const enabledQuickFilterValues: Record<string, string | number> = {};
+    if (quickFilterValues.estimatedEquityRateMin)
+      enabledQuickFilterValues.estimatedEquityRateMin = parseInt(quickFilterValues.estimatedEquityRateMin);
+    if (quickFilterValues.taxDelinquentYearMin)
+      enabledQuickFilterValues.taxDelinquentYearMin = parseInt(quickFilterValues.taxDelinquentYearMin);
+    if (quickFilterValues.purchaseDateMin)
+      enabledQuickFilterValues.purchaseDateMin = quickFilterValues.purchaseDateMin;
+
+    const filters: Record<string, unknown> = {
       location: location || undefined,
       property_type: propertyType || undefined,
       min_price: minPrice ? parseInt(minPrice) : undefined,
       max_price: maxPrice ? parseInt(maxPrice) : undefined,
+      quickFilter: Object.keys(enabledQuickFilter).length > 0 ? enabledQuickFilter : undefined,
+      quickFilterValues: Object.keys(enabledQuickFilterValues).length > 0 ? enabledQuickFilterValues : undefined,
     };
 
     onSearch(query, filters);
@@ -34,7 +69,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Main Search Bar */}
         <div>
           <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
@@ -45,13 +80,13 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             id="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="e.g., beachfront property Miami, luxury condo downtown..."
+            placeholder="e.g., Phoenix, AZ or Miami, FL..."
             disabled={isLoading}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
           />
         </div>
 
-        {/* Filters */}
+        {/* Basic Filters */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Location */}
           <div>
@@ -63,9 +98,9 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
               id="location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="Miami, FL"
+              placeholder="City, State or ZIP"
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
             />
           </div>
 
@@ -79,14 +114,14 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
               value={propertyType}
               onChange={(e) => setPropertyType(e.target.value)}
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
             >
               <option value="">All Types</option>
-              <option value="Villa">Villa</option>
+              <option value="Single Family">Single Family</option>
               <option value="Condo">Condo</option>
-              <option value="House">House</option>
-              <option value="Apartment">Apartment</option>
               <option value="Townhouse">Townhouse</option>
+              <option value="Multi-Family">Multi-Family</option>
+              <option value="Land">Land</option>
             </select>
           </div>
 
@@ -100,9 +135,9 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
               id="minPrice"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              placeholder="$100,000"
+              placeholder="Min price"
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
             />
           </div>
 
@@ -116,11 +151,129 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
               id="maxPrice"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              placeholder="$5,000,000"
+              placeholder="Max price"
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
             />
           </div>
+        </div>
+
+        {/* Quick Filters Section */}
+        <div className="border-t border-gray-200 pt-4">
+          <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
+            <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Quick Filters
+          </h3>
+
+          {/* Boolean Toggles */}
+          <div className="mb-4">
+            <p className="text-xs text-gray-500 mb-3 font-medium">Property Characteristics (Toggle ON/OFF)</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                { key: 'absenteeOwner', label: 'Absentee Owner', icon: '🏠' },
+                { key: 'ownerOccupied', label: 'Owner Occupied', icon: '👤' },
+                { key: 'propertyVacant', label: 'Vacant Property', icon: '🔑' },
+                { key: 'freeAndClear', label: 'Free & Clear', icon: '💰' },
+                { key: 'preforeclosureStatus', label: 'Pre-Foreclosure', icon: '⚠️' },
+                { key: 'tiredLandlord', label: 'Tired Landlord', icon: '🏢' },
+                { key: 'landVacantlot', label: 'Land / Vacant Lot', icon: '🌳' },
+              ].map(({ key, label, icon }) => (
+                <label key={key} className="relative flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 cursor-pointer transition group">
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    disabled={isLoading}
+                    checked={(quickFilter as any)[key]}
+                    onChange={(e) =>
+                      setQuickFilter((prev) => ({ ...(prev as any), [key]: e.target.checked }))
+                    }
+                  />
+                  <div className={`flex items-center space-x-2 ${(quickFilter as any)[key] ? 'text-blue-600' : 'text-gray-600'}`}>
+                    <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${(quickFilter as any)[key] ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`}>
+                      {(quickFilter as any)[key] && <span className="text-white text-xs">✓</span>}
+                    </div>
+                    <span className="text-lg">{icon}</span>
+                    <span className="text-sm font-medium">{label}</span>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Value Fields */}
+          <div className="border-t border-gray-200 pt-4">
+            <p className="text-xs text-gray-500 mb-3 font-medium">Advanced Filters (Enter Values)</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label htmlFor="equityMin" className="block text-sm font-medium text-gray-700 mb-2">
+                  Min Equity Rate (%)
+                </label>
+                <input
+                  type="number"
+                  id="equityMin"
+                  value={quickFilterValues.estimatedEquityRateMin}
+                  onChange={(e) =>
+                    setQuickFilterValues((prev) => ({
+                      ...prev,
+                      estimatedEquityRateMin: e.target.value,
+                    }))
+                  }
+                  placeholder="e.g., 60"
+                  min="0"
+                  max="100"
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="taxDelinquentYear" className="block text-sm font-medium text-gray-700 mb-2">
+                  Tax Delinquent Year
+                </label>
+                <input
+                  type="number"
+                  id="taxDelinquentYear"
+                  value={quickFilterValues.taxDelinquentYearMin}
+                  onChange={(e) =>
+                    setQuickFilterValues((prev) => ({
+                      ...prev,
+                      taxDelinquentYearMin: e.target.value,
+                    }))
+                  }
+                  placeholder="e.g., 2022"
+                  min="2000"
+                  max="2030"
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="purchaseDate" className="block text-sm font-medium text-gray-700 mb-2">
+                  Purchase Date (YYYY-MM-DD)
+                </label>
+                <input
+                  type="date"
+                  id="purchaseDate"
+                  value={quickFilterValues.purchaseDateMin}
+                  onChange={(e) =>
+                    setQuickFilterValues((prev) => ({
+                      ...prev,
+                      purchaseDateMin: e.target.value,
+                    }))
+                  }
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+                />
+              </div>
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-500 mt-3 bg-blue-50 p-2 rounded-lg">
+            💡 <strong>Quick Filters:</strong> Toggles use AND logic (all selected must match). Value fields are optional.
+          </p>
         </div>
 
         {/* Search Button */}
@@ -128,7 +281,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           <button
             type="submit"
             disabled={isLoading || !query.trim()}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.01]"
           >
             {isLoading ? (
               <>
@@ -176,12 +329,10 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         </div>
 
         {/* Cost Notice */}
-        <div className="text-center text-sm text-gray-600">
-          💳 Each search costs <strong>1 credit</strong>
+        <div className="text-center text-sm text-gray-600 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+          💳 <strong>Credits:</strong> Each search costs 1 credit. Results limited to 25 per page.
         </div>
       </form>
     </div>
   );
 }
-
-

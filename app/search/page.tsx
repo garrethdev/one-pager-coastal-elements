@@ -60,7 +60,7 @@ function SearchPageContent() {
         query,
         filters,
         1, // page
-        20 // limit
+        25 // limit per AC
       );
 
       if (response.success && response.data) {
