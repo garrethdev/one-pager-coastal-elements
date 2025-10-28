@@ -7,6 +7,16 @@ interface SearchFormProps {
   isLoading: boolean;
 }
 
+interface QuickFilterState {
+  absenteeOwner: boolean;
+  ownerOccupied: boolean;
+  propertyVacant: boolean;
+  freeAndClear: boolean;
+  preforeclosureStatus: boolean;
+  tiredLandlord: boolean;
+  landVacantlot: boolean;
+}
+
 export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [query, setQuery] = useState('');
   const [location, setLocation] = useState('');
@@ -15,7 +25,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [maxPrice, setMaxPrice] = useState('');
 
   // Boolean toggles (no additional values needed)
-  const [quickFilter, setQuickFilter] = useState({
+  const [quickFilter, setQuickFilter] = useState<QuickFilterState>({
     absenteeOwner: false,
     ownerOccupied: false,
     propertyVacant: false,
@@ -179,26 +189,29 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
                 { key: 'preforeclosureStatus', label: 'Pre-Foreclosure', icon: '⚠️' },
                 { key: 'tiredLandlord', label: 'Tired Landlord', icon: '🏢' },
                 { key: 'landVacantlot', label: 'Land / Vacant Lot', icon: '🌳' },
-              ].map(({ key, label, icon }) => (
-                <label key={key} className="relative flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 cursor-pointer transition group">
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    disabled={isLoading}
-                    checked={(quickFilter as any)[key]}
-                    onChange={(e) =>
-                      setQuickFilter((prev) => ({ ...(prev as any), [key]: e.target.checked }))
-                    }
-                  />
-                  <div className={`flex items-center space-x-2 ${(quickFilter as any)[key] ? 'text-blue-600' : 'text-gray-600'}`}>
-                    <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${(quickFilter as any)[key] ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`}>
-                      {(quickFilter as any)[key] && <span className="text-white text-xs">✓</span>}
-                    </div>
+              ].map(({ key, label, icon }) => {
+                const isChecked = quickFilter[key as keyof QuickFilterState];
+                return (
+                  <label key={key} className="relative flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 cursor-pointer transition group">
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      disabled={isLoading}
+                      checked={isChecked}
+                      onChange={(e) =>
+                        setQuickFilter((prev) => ({ ...prev, [key]: e.target.checked }))
+                      }
+                    />
+                    <div className={`flex items-center space-x-2 ${isChecked ? 'text-blue-600' : 'text-gray-600'}`}>
+                      <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${isChecked ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`}>
+                        {isChecked && <span className="text-white text-xs">✓</span>}
+                      </div>
                     <span className="text-lg">{icon}</span>
                     <span className="text-sm font-medium">{label}</span>
                   </div>
-                </label>
-              ))}
+                  </label>
+                );
+              })}
             </div>
           </div>
 
