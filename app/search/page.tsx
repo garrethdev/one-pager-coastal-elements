@@ -60,7 +60,7 @@ function SearchPageContent() {
         query,
         filters,
         1, // page
-        25 // limit per AC
+        1 // limit per AC (matches BATCHDATA_DEFAULT_TAKE in backend .env)
       );
 
       if (response.success && response.data) {
