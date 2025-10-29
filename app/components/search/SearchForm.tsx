@@ -56,8 +56,9 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
     purchaseDateMin: '', // Maps to sale.lastSaleDate.minDate
   });
 
-  // Owner filters
-  const [ownerStatusType, setOwnerStatusType] = useState<string[]>([]);
+  // Owner filters (future use)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [ownerStatusType, _setOwnerStatusType] = useState<string[]>([]);
 
   // Sale filters
   const [lastSaleDate, setLastSaleDate] = useState({ minDate: '', maxDate: '' });
@@ -70,22 +71,28 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [ltv, setLtv] = useState({ min: '', max: '' });
 
   // Mortgage/OpenLien filters
-  const [allLoanTypes, setAllLoanTypes] = useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [allLoanTypes, _setAllLoanTypes] = useState<string[]>([]);
   const [firstLoanInterestRate, setFirstLoanInterestRate] = useState({ min: '', max: '' });
   const [totalOpenLienCount, setTotalOpenLienCount] = useState({ min: '', max: '' });
   const [totalOpenLienBalance, setTotalOpenLienBalance] = useState({ min: '', max: '' });
 
-  // Foreclosure filters
-  const [foreclosureStatus, setForeclosureStatus] = useState<string[]>([]);
-  const [foreclosureRecordingDate, setForeclosureRecordingDate] = useState({ minDate: '', maxDate: '' });
-  const [foreclosureAuctionDate, setForeclosureAuctionDate] = useState({ minDate: '', maxDate: '' });
+  // Foreclosure filters (future use)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [foreclosureStatus, _setForeclosureStatus] = useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [foreclosureRecordingDate, _setForeclosureRecordingDate] = useState({ minDate: '', maxDate: '' });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [foreclosureAuctionDate, _setForeclosureAuctionDate] = useState({ minDate: '', maxDate: '' });
 
   // Tax filters
   const [taxDelinquentYear, setTaxDelinquentYear] = useState({ min: '' });
 
-  // Involuntary Lien filters
-  const [lienAmount, setLienAmount] = useState({ min: '', max: '' });
-  const [lienType, setLienType] = useState<string[]>([]);
+  // Involuntary Lien filters (future use)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [lienAmount, _setLienAmount] = useState({ min: '', max: '' });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [lienType, _setLienType] = useState<string[]>([]);
 
   // Owner Profile filters
   const [ownerPropertiesCount, setOwnerPropertiesCount] = useState({ min: '', max: '' });
@@ -156,8 +163,8 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       quickFilter: Object.keys(enabledQuickFilter).length > 0 ? enabledQuickFilter : undefined,
       quickFilterValues: Object.keys(enabledQuickFilterValues).length > 0 ? enabledQuickFilterValues : undefined,
       
-      // Owner filters
-      ownerStatusType: ownerStatusType.length > 0 ? ownerStatusType : undefined,
+      // Owner filters (commented out until UI is added)
+      // ownerStatusType: ownerStatusType.length > 0 ? ownerStatusType : undefined,
       
       // Sale filters
       lastSaleDate: buildDateRange(lastSaleDate.minDate, lastSaleDate.maxDate),
@@ -172,23 +179,23 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       assessedLandValue: buildRange(assessedLandValue.min, assessedLandValue.max),
       ltv: buildRange(ltv.min, ltv.max),
       
-      // Mortgage/OpenLien filters
-      allLoanTypes: allLoanTypes.length > 0 ? allLoanTypes : undefined,
+      // Mortgage/OpenLien filters (commented out until UI is added)
+      // allLoanTypes: allLoanTypes.length > 0 ? allLoanTypes : undefined,
       firstLoanInterestRate: buildRange(firstLoanInterestRate.min, firstLoanInterestRate.max),
       totalOpenLienCount: buildRange(totalOpenLienCount.min, totalOpenLienCount.max),
       totalOpenLienBalance: buildRange(totalOpenLienBalance.min, totalOpenLienBalance.max),
       
-      // Foreclosure filters
-      foreclosureStatus: foreclosureStatus.length > 0 ? foreclosureStatus : undefined,
-      foreclosureRecordingDate: buildDateRange(foreclosureRecordingDate.minDate, foreclosureRecordingDate.maxDate),
-      foreclosureAuctionDate: buildDateRange(foreclosureAuctionDate.minDate, foreclosureAuctionDate.maxDate),
+      // Foreclosure filters (commented out until UI is added)
+      // foreclosureStatus: foreclosureStatus.length > 0 ? foreclosureStatus : undefined,
+      // foreclosureRecordingDate: buildDateRange(foreclosureRecordingDate.minDate, foreclosureRecordingDate.maxDate),
+      // foreclosureAuctionDate: buildDateRange(foreclosureAuctionDate.minDate, foreclosureAuctionDate.maxDate),
       
       // Tax filters
       taxDelinquentYear: taxDelinquentYear.min ? { min: parseInt(taxDelinquentYear.min) } : undefined,
       
-      // Involuntary Lien filters
-      lienAmount: buildRange(lienAmount.min, lienAmount.max),
-      lienType: lienType.length > 0 ? lienType : undefined,
+      // Involuntary Lien filters (commented out until UI is added)
+      // lienAmount: buildRange(lienAmount.min, lienAmount.max),
+      // lienType: lienType.length > 0 ? lienType : undefined,
       
       // Owner Profile filters
       ownerPropertiesCount: buildRange(ownerPropertiesCount.min, ownerPropertiesCount.max),
