@@ -18,6 +18,7 @@ interface QuickFilterState {
   highEquity: boolean; // ≥40% equity
   cashBuyers: boolean; // Cash buyers (12 mo)
   onMarket: boolean; // On market
+  taxDelinquent3yrs: boolean; // Auto set tax year min to currentYear-3
 }
 
 export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
@@ -44,9 +45,10 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
     preforeclosureStatus: false,
     tiredLandlord: false,
     landVacantlot: false,
-    highEquity: false,
+    highEquity: true,
     cashBuyers: false,
     onMarket: false,
+    taxDelinquent3yrs: false,
   });
 
   // Value fields (quick filter values)
@@ -57,8 +59,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   });
 
   // Owner filters (future use)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [ownerStatusType, _setOwnerStatusType] = useState<string[]>([]);
+  const [ownerStatusType, setOwnerStatusType] = useState<string[]>([]);
 
   // Sale filters
   const [lastSaleDate, setLastSaleDate] = useState({ minDate: '', maxDate: '' });
@@ -71,28 +72,22 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [ltv, setLtv] = useState({ min: '', max: '' });
 
   // Mortgage/OpenLien filters
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [allLoanTypes, _setAllLoanTypes] = useState<string[]>([]);
+  const [allLoanTypes, setAllLoanTypes] = useState<string[]>([]);
   const [firstLoanInterestRate, setFirstLoanInterestRate] = useState({ min: '', max: '' });
   const [totalOpenLienCount, setTotalOpenLienCount] = useState({ min: '', max: '' });
   const [totalOpenLienBalance, setTotalOpenLienBalance] = useState({ min: '', max: '' });
 
   // Foreclosure filters (future use)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [foreclosureStatus, _setForeclosureStatus] = useState<string[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [foreclosureRecordingDate, _setForeclosureRecordingDate] = useState({ minDate: '', maxDate: '' });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [foreclosureAuctionDate, _setForeclosureAuctionDate] = useState({ minDate: '', maxDate: '' });
+  const [foreclosureStatus, setForeclosureStatus] = useState<string[]>([]);
+  const [foreclosureRecordingDate, setForeclosureRecordingDate] = useState({ minDate: '', maxDate: '' });
+  const [foreclosureAuctionDate, setForeclosureAuctionDate] = useState({ minDate: '', maxDate: '' });
 
   // Tax filters
   const [taxDelinquentYear, setTaxDelinquentYear] = useState({ min: '' });
 
   // Involuntary Lien filters (future use)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [lienAmount, _setLienAmount] = useState({ min: '', max: '' });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [lienType, _setLienType] = useState<string[]>([]);
+  const [lienAmount, setLienAmount] = useState({ min: '', max: '' });
+  const [lienType, setLienType] = useState<string[]>([]);
 
   // Owner Profile filters
   const [ownerPropertiesCount, setOwnerPropertiesCount] = useState({ min: '', max: '' });
@@ -164,7 +159,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       quickFilterValues: Object.keys(enabledQuickFilterValues).length > 0 ? enabledQuickFilterValues : undefined,
       
       // Owner filters (commented out until UI is added)
-      // ownerStatusType: ownerStatusType.length > 0 ? ownerStatusType : undefined,
+      ownerStatusType: ownerStatusType.length > 0 ? ownerStatusType : undefined,
       
       // Sale filters
       lastSaleDate: buildDateRange(lastSaleDate.minDate, lastSaleDate.maxDate),
@@ -180,22 +175,22 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       ltv: buildRange(ltv.min, ltv.max),
       
       // Mortgage/OpenLien filters (commented out until UI is added)
-      // allLoanTypes: allLoanTypes.length > 0 ? allLoanTypes : undefined,
+      allLoanTypes: allLoanTypes.length > 0 ? allLoanTypes : undefined,
       firstLoanInterestRate: buildRange(firstLoanInterestRate.min, firstLoanInterestRate.max),
       totalOpenLienCount: buildRange(totalOpenLienCount.min, totalOpenLienCount.max),
       totalOpenLienBalance: buildRange(totalOpenLienBalance.min, totalOpenLienBalance.max),
       
       // Foreclosure filters (commented out until UI is added)
-      // foreclosureStatus: foreclosureStatus.length > 0 ? foreclosureStatus : undefined,
-      // foreclosureRecordingDate: buildDateRange(foreclosureRecordingDate.minDate, foreclosureRecordingDate.maxDate),
-      // foreclosureAuctionDate: buildDateRange(foreclosureAuctionDate.minDate, foreclosureAuctionDate.maxDate),
+      foreclosureStatus: foreclosureStatus.length > 0 ? foreclosureStatus : undefined,
+      foreclosureRecordingDate: buildDateRange(foreclosureRecordingDate.minDate, foreclosureRecordingDate.maxDate),
+      foreclosureAuctionDate: buildDateRange(foreclosureAuctionDate.minDate, foreclosureAuctionDate.maxDate),
       
       // Tax filters
       taxDelinquentYear: taxDelinquentYear.min ? { min: parseInt(taxDelinquentYear.min) } : undefined,
       
       // Involuntary Lien filters (commented out until UI is added)
-      // lienAmount: buildRange(lienAmount.min, lienAmount.max),
-      // lienType: lienType.length > 0 ? lienType : undefined,
+      lienAmount: buildRange(lienAmount.min, lienAmount.max),
+      lienType: lienType.length > 0 ? lienType : undefined,
       
       // Owner Profile filters
       ownerPropertiesCount: buildRange(ownerPropertiesCount.min, ownerPropertiesCount.max),
@@ -314,6 +309,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {[
                 { key: 'highEquity', label: 'High Equity (≥40%)', icon: '📈' },
+                { key: 'taxDelinquent3yrs', label: 'Tax Delinquent (Last 3 Yrs)', icon: '🧾' },
                 { key: 'absenteeOwner', label: 'Absentee Owner', icon: '🏠' },
                 { key: 'ownerOccupied', label: 'Owner Occupied', icon: '👤' },
                 { key: 'propertyVacant', label: 'Vacant Property', icon: '🔑' },
@@ -623,6 +619,148 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             </div>
           )}
         </div>
+
+        {/* Advanced Filters Toggle */}
+        <div className="flex justify-between items-center">
+          <button
+            type="button"
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            disabled={isLoading}
+            className="text-blue-600 hover:underline"
+          >
+            {showAdvancedFilters ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
+          </button>
+        </div>
+
+        {showAdvancedFilters && (
+          <div className="space-y-6">
+            {/* Owner Status Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Owner Status Type (comma-separated)</label>
+              <input
+                type="text"
+                value={ownerStatusType.join(',')}
+                onChange={(e) => setOwnerStatusType(e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                placeholder="Individual, Corporate, Trust"
+                disabled={isLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+              />
+            </div>
+
+            {/* All Loan Types */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">All Loan Types (comma-separated)</label>
+              <input
+                type="text"
+                value={allLoanTypes.join(',')}
+                onChange={(e) => setAllLoanTypes(e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                placeholder="FHA, VA, Conventional"
+                disabled={isLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+              />
+            </div>
+
+            {/* Foreclosure Status */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Foreclosure Status (comma-separated)</label>
+              <input
+                type="text"
+                value={foreclosureStatus.join(',')}
+                onChange={(e) => setForeclosureStatus(e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                placeholder="NOD, LisPendens, NOS"
+                disabled={isLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+              />
+            </div>
+
+            {/* Foreclosure Recording Date Range */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Foreclosure Recording Date (Min)</label>
+                <input
+                  type="date"
+                  value={foreclosureRecordingDate.minDate}
+                  onChange={(e) => setForeclosureRecordingDate({ ...foreclosureRecordingDate, minDate: e.target.value })}
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Foreclosure Recording Date (Max)</label>
+                <input
+                  type="date"
+                  value={foreclosureRecordingDate.maxDate}
+                  onChange={(e) => setForeclosureRecordingDate({ ...foreclosureRecordingDate, maxDate: e.target.value })}
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+                />
+              </div>
+            </div>
+
+            {/* Foreclosure Auction Date Range */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Foreclosure Auction Date (Min)</label>
+                <input
+                  type="date"
+                  value={foreclosureAuctionDate.minDate}
+                  onChange={(e) => setForeclosureAuctionDate({ ...foreclosureAuctionDate, minDate: e.target.value })}
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Foreclosure Auction Date (Max)</label>
+                <input
+                  type="date"
+                  value={foreclosureAuctionDate.maxDate}
+                  onChange={(e) => setForeclosureAuctionDate({ ...foreclosureAuctionDate, maxDate: e.target.value })}
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+                />
+              </div>
+            </div>
+
+            {/* Involuntary Lien Amount Range */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Lien Amount (Min)</label>
+                <input
+                  type="number"
+                  value={lienAmount.min}
+                  onChange={(e) => setLienAmount({ ...lienAmount, min: e.target.value })}
+                  placeholder="e.g., 10000"
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Lien Amount (Max)</label>
+                <input
+                  type="number"
+                  value={lienAmount.max}
+                  onChange={(e) => setLienAmount({ ...lienAmount, max: e.target.value })}
+                  placeholder="e.g., 500000"
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+                />
+              </div>
+            </div>
+
+            {/* Involuntary Lien Types */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Lien Types (comma-separated)</label>
+              <input
+                type="text"
+                value={lienType.join(',')}
+                onChange={(e) => setLienType(e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                placeholder="Tax Lien, HOA Lien, Mechanics Lien"
+                disabled={isLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 transition"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Search Button */}
         <div>
