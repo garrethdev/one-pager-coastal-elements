@@ -105,24 +105,42 @@ function SearchPageContent() {
   };
 
   const handleExport = async () => {
-    if (!user?.access_token || !lastQuery) return;
+    if (!user?.access_token) {
+      setError('Please login to export');
+      return;
+    }
+
+    if (!lastQuery && !lastFilters) {
+      setError('Please perform a search first before exporting');
+      return;
+    }
+
+    // Check credits before export
+    if (profile && profile.current_credits < 1) {
+      setError('Insufficient credits. You need at least 1 credit to export.');
+      return;
+    }
 
     setIsExporting(true);
+    setError('');
+    
     try {
       const response = await apiClient.exportSearchToCsv(
         user.access_token,
-        lastQuery,
-        lastFilters
+        lastQuery || '',
+        lastFilters || {}
       );
 
       if (response.success && response.data) {
         // Create blob and download
         const csvContent = response.data.csv;
-        const filename = response.data.filename || 'export.csv';
+        const filename = response.data.filename || `property-export-${Date.now()}.csv`;
         const totalProperties = response.data.total_properties || 0;
+        const creditsUsed = response.credits_used || 0;
         
-        if (!csvContent) {
-          alert('No CSV data received');
+        if (!csvContent || csvContent === 'No properties found') {
+          alert('No properties found to export. Try different search criteria.');
+          setIsExporting(false);
           return;
         }
         
@@ -136,17 +154,21 @@ function SearchPageContent() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        URL.revokeObjectURL(url); // Clean up
 
         // Refresh profile to update credits
         await refreshProfile();
 
-        alert(`Exported ${totalProperties} properties!`);
+        alert(`✅ Successfully exported ${totalProperties} properties!${creditsUsed > 0 ? ` (Used ${creditsUsed} credit)` : ''}`);
       } else {
+        setError(response.error || 'Failed to export');
         alert(response.error || 'Failed to export');
       }
     } catch (err) {
       console.error('Export error:', err);
-      alert('An error occurred while exporting: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Export failed: ${errorMessage}`);
+      alert(`An error occurred while exporting: ${errorMessage}`);
     } finally {
       setIsExporting(false);
     }

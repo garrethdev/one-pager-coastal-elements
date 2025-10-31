@@ -77,6 +77,8 @@ export interface ExportResponse {
   csv: string;
   filename: string;
   total_properties: number;
+  credits_used?: number;
+  remaining_credits?: number;
 }
 
 export interface QuickList {
