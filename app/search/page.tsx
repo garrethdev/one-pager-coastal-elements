@@ -105,12 +105,14 @@ function SearchPageContent() {
   };
 
   const handleExport = async () => {
+    console.log('🔵 Export button clicked!', { lastQuery, lastFilters, hasToken: !!user?.access_token });
+    
     if (!user?.access_token) {
       setError('Please login to export');
       return;
     }
 
-    if (!lastQuery && !lastFilters) {
+    if (!lastQuery && Object.keys(lastFilters || {}).length === 0) {
       setError('Please perform a search first before exporting');
       return;
     }
@@ -124,12 +126,16 @@ function SearchPageContent() {
     setIsExporting(true);
     setError('');
     
+    console.log('🟢 Calling export API...', { query: lastQuery || '', filters: lastFilters || {} });
+    
     try {
       const response = await apiClient.exportSearchToCsv(
         user.access_token,
         lastQuery || '',
         lastFilters || {}
       );
+      
+      console.log('🟡 Export API response:', response);
 
       if (response.success && response.data) {
         // Create blob and download
@@ -165,12 +171,18 @@ function SearchPageContent() {
         alert(response.error || 'Failed to export');
       }
     } catch (err) {
-      console.error('Export error:', err);
+      console.error('❌ Export error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error('❌ Export error details:', {
+        message: errorMessage,
+        error: err,
+        stack: err instanceof Error ? err.stack : undefined,
+      });
       setError(`Export failed: ${errorMessage}`);
       alert(`An error occurred while exporting: ${errorMessage}`);
     } finally {
       setIsExporting(false);
+      console.log('🔴 Export finished (success or error)');
     }
   };
 

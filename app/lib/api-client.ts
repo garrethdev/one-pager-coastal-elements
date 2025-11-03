@@ -77,8 +77,16 @@ export interface ExportResponse {
   csv: string;
   filename: string;
   total_properties: number;
-  credits_used?: number;
-  remaining_credits?: number;
+}
+
+export interface ExportSearchResponse {
+  success: boolean;
+  data: ExportResponse;
+  credits_used: number;
+  remaining_credits: number;
+  repeat_search?: boolean;
+  matched_audit_id?: string;
+  error?: string;
 }
 
 export interface QuickList {
@@ -102,10 +110,12 @@ class ApiClient {
    */
   private async fetchWithTimeout(
     url: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    customTimeout?: number
   ): Promise<Response> {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    const timeout = customTimeout || this.timeout;
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
       const response = await fetch(url, {
@@ -166,8 +176,18 @@ class ApiClient {
   async post<T = unknown>(
     endpoint: string,
     body: Record<string, unknown>,
-    token?: string
+    token?: string,
+    customTimeout?: number
   ): Promise<ApiResponse<T>> {
+    if (endpoint === '/search/export') {
+      console.log('🌐 HTTP POST Request:', {
+        url: `${this.baseUrl}${endpoint}`,
+        hasToken: !!token,
+        bodyKeys: Object.keys(body),
+        timeout: customTimeout || this.timeout,
+      });
+    }
+    
     try {
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
@@ -177,11 +197,19 @@ class ApiClient {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await this.fetchWithTimeout(`${this.baseUrl}${endpoint}`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body),
-      });
+      const response = await this.fetchWithTimeout(
+        `${this.baseUrl}${endpoint}`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(body),
+        },
+        customTimeout
+      );
+      
+      if (endpoint === '/search/export') {
+        console.log('🌐 HTTP POST Response status:', response.status, response.statusText);
+      }
 
       const data = await response.json();
 
@@ -329,15 +357,35 @@ class ApiClient {
     token: string,
     query: string,
     filters?: Record<string, unknown>
-  ): Promise<ApiResponse<ExportResponse>> {
-    return this.post<ExportResponse>(
+  ): Promise<ExportSearchResponse> {
+    console.log('📤 API Client: exportSearchToCsv called', { 
+      endpoint: '/search/export', 
+      hasToken: !!token,
+      query,
+      filtersCount: filters ? Object.keys(filters).length : 0,
+    });
+    
+    // Use longer timeout for export (120 seconds) since it may take longer
+    const exportTimeout = 120000; // 120 seconds
+    
+    const result = await this.post<ExportResponse>(
       '/search/export',
       {
         query,
         filters,
       },
-      token
-    );
+      token,
+      exportTimeout
+    ) as ExportSearchResponse;
+    
+    console.log('📥 API Client: exportSearchToCsv response', { 
+      success: result.success,
+      hasData: !!result.data,
+      credits_used: result.credits_used,
+      error: result.error,
+    });
+    
+    return result;
   }
 
   // ============= SAVED SEARCHES ENDPOINTS =============
