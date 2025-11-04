@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
 import { SearchForm } from '../components/search/SearchForm';
+import { AISearchForm } from '../components/search/AISearchForm';
 import { SearchResults, SearchResult } from '../components/search/SearchResults';
 import { apiClient } from '../lib/api-client';
 
@@ -101,6 +102,54 @@ function SearchPageContent() {
       alert('An error occurred while saving');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAISearch = async (query: string) => {
+    if (!user?.access_token) {
+      setError('Please login to search');
+      return;
+    }
+
+    // Check credits
+    if (profile && profile.current_credits < 1) {
+      setError('Insufficient credits. You need at least 1 credit to search.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+    setLastQuery(query); // Save for export (no filters for AI search)
+    setLastFilters({}); // Clear filters for AI search
+
+    try {
+      const response = await apiClient.searchWithAI(
+        user.access_token,
+        query,
+        1, // page
+        1 // limit per AC (matches BATCHDATA_DEFAULT_TAKE in backend .env)
+      );
+
+      if (response.success && response.data) {
+        setResults(response.data as SearchResult[]);
+        setSearchInfo({
+          creditsUsed: response.credits_used || 1,
+          remainingCredits: response.remaining_credits || 0,
+          pagination: response.pagination,
+        });
+
+        // Refresh profile to update credits
+        await refreshProfile();
+      } else {
+        setError(response.error || 'AI search failed');
+        setResults([]);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      setError(`AI search error: ${errorMessage}`);
+      setResults([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -212,8 +261,20 @@ function SearchPageContent() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search Form */}
-        <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+        {/* AI Search Form */}
+        <div className="mb-6">
+          <AISearchForm onSearch={handleAISearch} isLoading={isLoading} />
+        </div>
+
+        {/* Regular Search Form */}
+        <div className="mb-6">
+          <div className="flex items-center mb-4">
+            <div className="flex-1 border-t border-gray-300"></div>
+            <span className="px-4 text-sm text-gray-500 font-medium">OR</span>
+            <div className="flex-1 border-t border-gray-300"></div>
+          </div>
+          <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+        </div>
 
         {/* Error Message */}
         {error && (

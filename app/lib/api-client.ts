@@ -351,6 +351,26 @@ class ApiClient {
   }
 
   /**
+   * AI-powered search using natural language
+   */
+  async searchWithAI(
+    token: string,
+    query: string,
+    page: number = 1,
+    limit: number = 1
+  ): Promise<SearchResponse> {
+    return this.post<unknown[]>(
+      '/search/ai',
+      {
+        query,
+        page,
+        limit,
+      },
+      token
+    ) as Promise<SearchResponse>;
+  }
+
+  /**
    * Export search results to CSV
    */
   async exportSearchToCsv(
