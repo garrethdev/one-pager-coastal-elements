@@ -376,13 +376,15 @@ class ApiClient {
   async exportSearchToCsv(
     token: string,
     query: string,
-    filters?: Record<string, unknown>
+    filters?: Record<string, unknown>,
+    limit?: number
   ): Promise<ExportSearchResponse> {
     console.log('📤 API Client: exportSearchToCsv called', { 
       endpoint: '/search/export', 
       hasToken: !!token,
       query,
       filtersCount: filters ? Object.keys(filters).length : 0,
+      limit,
     });
     
     // Use longer timeout for export (120 seconds) since it may take longer
@@ -393,6 +395,7 @@ class ApiClient {
       {
         query,
         filters,
+        limit,
       },
       token,
       exportTimeout
