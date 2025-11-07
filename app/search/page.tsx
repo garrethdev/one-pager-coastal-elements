@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
 import { SearchForm } from '../components/search/SearchForm';
@@ -27,8 +28,13 @@ interface SearchInfo {
   };
 }
 
+interface RepeatWarning {
+  savedSearchId: string;
+}
+
 function SearchPageContent() {
   const { user, profile, refreshProfile } = useAuth();
+  const router = useRouter();
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,6 +43,7 @@ function SearchPageContent() {
   const [lastFilters, setLastFilters] = useState<Record<string, unknown>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [repeatWarning, setRepeatWarning] = useState<RepeatWarning | null>(null);
 
   const handleSearch = async (query: string, filters: Record<string, unknown>) => {
     setLastQuery(query); // Save last query for saving later
@@ -71,6 +78,12 @@ function SearchPageContent() {
           remainingCredits: response.remaining_credits || 0,
           pagination: response.pagination,
         });
+
+        if (response.repeat_search && response.matched_saved_search_id) {
+          setRepeatWarning({ savedSearchId: response.matched_saved_search_id });
+        } else {
+          setRepeatWarning(null);
+        }
 
         // Refresh profile to update credits
         await refreshProfile();
@@ -138,6 +151,12 @@ function SearchPageContent() {
           pagination: response.pagination,
         });
 
+        if (response.repeat_search && response.matched_saved_search_id) {
+          setRepeatWarning({ savedSearchId: response.matched_saved_search_id });
+        } else {
+          setRepeatWarning(null);
+        }
+
         // Refresh profile to update credits
         await refreshProfile();
       } else {
@@ -192,6 +211,10 @@ function SearchPageContent() {
         const filename = response.data.filename || `property-export-${Date.now()}.csv`;
         const totalProperties = response.data.total_properties || 0;
         const creditsUsed = response.credits_used || 0;
+
+        if (response.repeat_search && response.matched_saved_search_id) {
+          setRepeatWarning({ savedSearchId: response.matched_saved_search_id });
+        }
         
         if (!csvContent || csvContent === 'No properties found') {
           alert('No properties found to export. Try different search criteria.');
@@ -280,6 +303,37 @@ function SearchPageContent() {
         {error && (
           <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-600">{error}</p>
+          </div>
+        )}
+
+        {/* Duplicate Search Warning */}
+        {repeatWarning && (
+          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p className="text-yellow-900 font-semibold text-lg">Heads up! This looks like a repeat search.</p>
+                <p className="text-yellow-800 text-sm mt-1">
+                  The filters you just used match a saved search you ran in the last 30 days. Re-running costs credits again.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => router.push('/saved-searches')}
+                  className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg transition"
+                >
+                  View Saved Searches
+                </button>
+                <button
+                  onClick={() => setRepeatWarning(null)}
+                  className="px-4 py-2 bg-white border border-yellow-400 text-yellow-800 font-semibold rounded-lg hover:bg-yellow-100 transition"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-yellow-700 mt-3">
+              Saved search ID: <span className="font-mono">{repeatWarning.savedSearchId}</span>
+            </p>
           </div>
         )}
 

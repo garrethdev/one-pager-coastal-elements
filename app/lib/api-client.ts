@@ -69,6 +69,8 @@ export interface SearchResponse {
     limit: number;
     pages: number;
   };
+  repeat_search?: boolean;
+  matched_saved_search_id?: string;
   error?: string;
   message?: string;
 }
@@ -85,7 +87,7 @@ export interface ExportSearchResponse {
   credits_used: number;
   remaining_credits: number;
   repeat_search?: boolean;
-  matched_audit_id?: string;
+  matched_saved_search_id?: string;
   error?: string;
 }
 
