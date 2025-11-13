@@ -21,6 +21,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   requestOtp: (email: string) => Promise<{ success: boolean; error?: string }>;
   refreshProfile: () => Promise<void>;
+  subscribeToPlan: (planId: string) => Promise<{ success: boolean; error?: string }>;
+  cancelSubscription: () => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -155,6 +157,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const subscribeToPlan = async (planId: string) => {
+    if (!user?.access_token) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    if (!planId) {
+      return { success: false, error: 'Plan ID is required' };
+    }
+
+    const response = await apiClient.createSubscription(user.access_token, planId);
+
+    if (response.success) {
+      if (response.data) {
+        setProfile(response.data);
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(response.data));
+      } else {
+        await refreshProfile();
+      }
+      return { success: true };
+    }
+
+    return {
+      success: false,
+      error: response.error || 'Failed to create subscription',
+    };
+  };
+
+  const cancelSubscription = async () => {
+    if (!user?.access_token) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    const response = await apiClient.cancelSubscription(user.access_token);
+
+    if (response.success) {
+      if (response.data) {
+        setProfile(response.data);
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(response.data));
+      } else {
+        await refreshProfile();
+      }
+      return { success: true };
+    }
+
+    return {
+      success: false,
+      error: response.error || 'Failed to cancel subscription',
+    };
+  };
+
   const value = {
     user,
     profile,
@@ -164,6 +216,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     logout,
     requestOtp,
     refreshProfile,
+    subscribeToPlan,
+    cancelSubscription,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

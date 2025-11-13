@@ -25,14 +25,7 @@ export interface AuthResponse {
       expires_in: number;
       token_type: string;
     };
-    profile: {
-      id: string;
-      email: string;
-      user_id_supabase: string;
-      current_credits: number;
-      subscription_plan: string;
-      created_at: string;
-    };
+    profile: UserProfile;
   };
 }
 
@@ -41,7 +34,14 @@ export interface UserProfile {
   email: string;
   user_id_supabase: string;
   current_credits: number;
-  subscription_plan: string;
+  subscription_plan?: string | null;
+  plan_id?: string | null;
+  plan_name?: string | null;
+  chargebee_customer_id?: string | null;
+  period_end?: string | null;
+  cancel_period_at?: string | null;
+  status?: string | null;
+  auto_renews?: boolean | null;
   created_at: string;
 }
 
@@ -311,14 +311,17 @@ class ApiClient {
     return this.post<UserProfile>('/users/credits', { credits }, token);
   }
 
-  /**
-   * Update subscription plan
-   */
-  async updateSubscription(
+  async createSubscription(
     token: string,
-    plan: string
+    planId: string
   ): Promise<ApiResponse<UserProfile>> {
-    return this.post<UserProfile>('/users/subscription', { plan }, token);
+    return this.post<UserProfile>('/users/subscription', { planId }, token);
+  }
+
+  async cancelSubscription(
+    token: string
+  ): Promise<ApiResponse<UserProfile>> {
+    return this.post<UserProfile>('/users/subscription/cancel', {}, token);
   }
 
   // ============= SEARCH ENDPOINTS =============
