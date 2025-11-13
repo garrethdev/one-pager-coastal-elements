@@ -324,6 +324,12 @@ class ApiClient {
     return this.post<UserProfile>('/users/subscription/cancel', {}, token);
   }
 
+  async attachTestPaymentMethod(
+    token: string
+  ): Promise<ApiResponse<{ payment_source_id: string | null }>> {
+    return this.post('/users/payment-source/test-card', {}, token);
+  }
+
   // ============= SEARCH ENDPOINTS =============
 
   /**

@@ -66,21 +66,16 @@ function DashboardContent() {
   const planOptions = useMemo(() => {
     const base = AVAILABLE_PLANS.map((plan) => ({
       ...plan,
-      isActive: plan.id !== 'custom' && plan.id === activePlanId,
-      isCustom: plan.id === 'custom',
+      isActive: plan.id === activePlanId,
     }));
 
-    if (
-      activePlanId &&
-      !base.some((plan) => !plan.isCustom && plan.id === activePlanId)
-    ) {
+    if (activePlanId && !base.some((plan) => plan.id === activePlanId)) {
       base.unshift({
         id: activePlanId,
         name: activePlanId,
         price: '',
         description: 'Current plan detected from profile',
         isActive: true,
-        isCustom: false,
       });
     }
 
@@ -93,16 +88,9 @@ function DashboardContent() {
   };
 
   const handleSubscribe = async () => {
-    const isCustom = selectedPlan === 'custom';
-    const planId = isCustom ? customPlanId.trim() : selectedPlan;
-
+    const planId = (customPlanId || selectedPlan).trim();
     if (!planId) {
-      setFeedback({
-        type: 'error',
-        message: isCustom
-          ? 'Please enter the Chargebee plan ID to use.'
-          : 'Please select a plan.',
-      });
+      setFeedback({ type: 'error', message: 'Please provide a plan ID.' });
       return;
     }
     setIsProcessing(true);
