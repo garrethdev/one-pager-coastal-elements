@@ -23,6 +23,7 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
   subscribeToPlan: (planId: string) => Promise<{ success: boolean; error?: string }>;
   cancelSubscription: () => Promise<{ success: boolean; error?: string }>;
+  attachTestPaymentMethod: () => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -207,6 +208,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   };
 
+  const attachTestPaymentMethod = async () => {
+    if (!user?.access_token) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    const response = await apiClient.attachTestPaymentMethod(
+      user.access_token,
+    );
+
+    if (response.success) {
+      await refreshProfile();
+      return { success: true };
+    }
+
+    return {
+      success: false,
+      error: response.error || 'Failed to attach test payment method',
+    };
+  };
+
   const value = {
     user,
     profile,
@@ -218,6 +239,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshProfile,
     subscribeToPlan,
     cancelSubscription,
+    attachTestPaymentMethod,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -45,6 +45,7 @@ function DashboardContent() {
     subscribeToPlan,
     cancelSubscription,
     refreshProfile,
+    attachTestPaymentMethod,
   } = useAuth();
   const router = useRouter();
 
@@ -88,9 +89,16 @@ function DashboardContent() {
   };
 
   const handleSubscribe = async () => {
-    const planId = (customPlanId || selectedPlan).trim();
+    const isCustom = selectedPlan === 'custom';
+    const planId = (isCustom ? customPlanId : selectedPlan).trim();
+
     if (!planId) {
-      setFeedback({ type: 'error', message: 'Please provide a plan ID.' });
+      setFeedback({
+        type: 'error',
+        message: isCustom
+          ? 'Please provide an item price ID.'
+          : 'Please select a plan.',
+      });
       return;
     }
     setIsProcessing(true);
@@ -126,6 +134,26 @@ function DashboardContent() {
       setFeedback({
         type: 'error',
         message: result.error || 'Failed to cancel subscription.',
+      });
+    }
+    setIsProcessing(false);
+  };
+
+  const handleAttachTestCard = async () => {
+    setIsProcessing(true);
+    setFeedback(null);
+    const result = await attachTestPaymentMethod();
+    if (result.success) {
+      setFeedback({
+        type: 'success',
+        message:
+          'Test payment method attached. You can now create a subscription.',
+      });
+      await refreshProfile();
+    } else {
+      setFeedback({
+        type: 'error',
+        message: result.error || 'Failed to attach test payment method.',
       });
     }
     setIsProcessing(false);
@@ -278,6 +306,19 @@ function DashboardContent() {
               </div>
 
               <div className="space-y-2">
+                <button
+                  onClick={handleAttachTestCard}
+                  disabled={isProcessing}
+                  className="w-full px-4 py-2 bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400 text-white font-semibold rounded-lg transition"
+                >
+                  {isProcessing ? 'Processing…' : 'Attach Chargebee Test Card'}
+                </button>
+                <p className="text-xs text-gray-500">
+                  Chargebee requires a payment method per customer even in the
+                  sandbox. This button attaches the default test card
+                  (4111&nbsp;1111&nbsp;1111&nbsp;1111) so you can create
+                  subscriptions from the app.
+                </p>
                 <label
                   htmlFor="custom-plan-id"
                   className="text-sm font-medium text-gray-700"
