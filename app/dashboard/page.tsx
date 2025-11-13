@@ -7,13 +7,17 @@ import { useRouter } from 'next/navigation';
 
 const AVAILABLE_PLANS = [
   {
-    id: 'starter-plan',
+    id: 'starter-plan-USD-Monthly',
+    itemPriceId: 'starter-plan-USD-Monthly',
+    planCode: 'starter-plan',
     name: 'Starter Plan',
     price: '$15.00 / month',
     description: 'Entry tier for individual agents and trials.',
   },
   {
-    id: 'pro-plan',
+    id: 'pro-plan-USD-Monthly',
+    itemPriceId: 'pro-plan-USD-Monthly',
+    planCode: 'pro-plan',
     name: 'Pro Plan',
     price: '$25.00 / month',
     description: 'Unlock advanced exports and higher limits.',
@@ -65,10 +69,16 @@ function DashboardContent() {
   const cancelAt = formatDateTime(profile?.cancel_period_at ?? null);
 
   const planOptions = useMemo(() => {
-    const base = AVAILABLE_PLANS.map((plan) => ({
-      ...plan,
-      isActive: plan.id === activePlanId,
-    }));
+    const base = AVAILABLE_PLANS.map((plan) => {
+      const isActive =
+        plan.itemPriceId === activePlanId ||
+        plan.planCode === activePlanId ||
+        plan.id === activePlanId;
+      return {
+        ...plan,
+        isActive,
+      };
+    });
 
     if (activePlanId && !base.some((plan) => plan.id === activePlanId)) {
       base.unshift({
@@ -82,6 +92,17 @@ function DashboardContent() {
 
     return base;
   }, [activePlanId]);
+
+  React.useEffect(() => {
+    const validOptions = new Set([
+      ...AVAILABLE_PLANS.map((plan) => plan.id),
+      'custom',
+    ]);
+
+    if (!validOptions.has(selectedPlan)) {
+      setSelectedPlan(AVAILABLE_PLANS[0]?.id ?? '');
+    }
+  }, [selectedPlan]);
 
   const handleLogout = async () => {
     await logout();
