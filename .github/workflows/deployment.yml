@@ -8,6 +8,7 @@ on:
     types: [closed]
     branches:
       - dev
+      - main
 
 jobs:
   deploy-to-ec2:
